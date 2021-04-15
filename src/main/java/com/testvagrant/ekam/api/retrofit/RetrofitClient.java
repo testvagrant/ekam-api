@@ -59,6 +59,17 @@ public class RetrofitClient implements HttpClient<Retrofit> {
     this.converterFactory = converterFactory;
   }
 
+
+  public RetrofitClient(String baseUrl) {
+    this();
+    this.retrofit = build(baseUrl);
+  }
+
+  public RetrofitClient(Retrofit retrofit) {
+    this();
+    this.retrofit = retrofit;
+  }
+
   public Retrofit build(String baseUrl) {
     Retrofit.Builder builder = retrofitClientBuilder(baseUrl);
     retrofit = builder.build();

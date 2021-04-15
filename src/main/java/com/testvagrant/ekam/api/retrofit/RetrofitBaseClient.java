@@ -14,6 +14,10 @@ public class RetrofitBaseClient {
     this.httpClient.build(baseUrl);
   }
 
+  public RetrofitBaseClient(RetrofitClient httpClient) {
+    this.httpClient = httpClient;
+  }
+
   public RetrofitBaseClient(String baseUrl) {
     this.httpClient = new RetrofitClient();
     this.httpClient.build(baseUrl);
