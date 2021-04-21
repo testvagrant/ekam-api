@@ -1,6 +1,6 @@
 package com.testvagrant.ekam.api.retrofit;
 
-import com.google.gson.Gson;
+import com.google.gson.*;
 import com.testvagrant.ekam.api.HttpClient;
 import io.qameta.allure.okhttp3.AllureOkHttp3;
 import okhttp3.Interceptor;
@@ -13,10 +13,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.lang.reflect.Type;
+import java.util.*;
 
 public class RetrofitClient implements HttpClient<Retrofit> {
 
@@ -33,9 +33,16 @@ public class RetrofitClient implements HttpClient<Retrofit> {
   public RetrofitClient() {
     this.callTypeFinder = new CallTypeFinder();
     this.gson = new Gson();
-    this.interceptors = Collections.singletonList(getHttpLoggingInterceptor());
-    this.converterFactory = Collections.singletonList(GsonConverterFactory.create(new Gson()));
+    this.interceptors = new ArrayList<>();
+    this.converterFactory = Collections.singletonList(GsonConverterFactory.create(getGson()));
     this.okHttpClient = getOkHttpClient();
+  }
+
+  private Gson getGson() {
+    return new GsonBuilder()
+            .setLenient()
+            .registerTypeHierarchyAdapter(byte[].class,
+                    new ByteArrayToBase64TypeAdapter()).create();
   }
 
   public RetrofitClient(Interceptor... interceptors) {
@@ -93,7 +100,7 @@ public class RetrofitClient implements HttpClient<Retrofit> {
     OkHttpClient okHttpClient =
         getOkHttpBuilder()
             .addInterceptor(new AllureOkHttp3())
-            .addInterceptor(getHttpLoggingInterceptor())
+//            .addInterceptor(getHttpLoggingInterceptor())
             .build();
     return okHttpClient;
   }
@@ -143,5 +150,17 @@ public class RetrofitClient implements HttpClient<Retrofit> {
 
   private <Type> Class<Type> mapErrorType(Call<Type> call) {
     return callTypeFinder.getType(call);
+  }
+
+  private static class ByteArrayToBase64TypeAdapter implements JsonDeserializer<byte[]> {
+    public byte[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+      String asString = json.getAsString();
+      try {
+        asString.getBytes("UTF-8");
+      } catch (UnsupportedEncodingException e) {
+        e.printStackTrace();
+      }
+      return new byte[]{0};
+    }
   }
 }
