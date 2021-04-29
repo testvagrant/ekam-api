@@ -2,7 +2,6 @@ package com.testvagrant.ekam.api.endpoints;
 
 import com.testvagrant.ekam.api.models.CatFacts;
 import com.testvagrant.ekam.api.retrofit.RetrofitBaseClient;
-import com.testvagrant.ekam.api.retrofit.RetrofitClient;
 import retrofit2.Call;
 import retrofit2.Response;
 
