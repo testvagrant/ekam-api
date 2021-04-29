@@ -2,7 +2,6 @@ package com.testvagrant.ekam.api.retrofit;
 
 import com.google.gson.*;
 import com.testvagrant.ekam.api.HttpClient;
-import io.qameta.allure.okhttp3.AllureOkHttp3;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -13,129 +12,67 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class RetrofitClient implements HttpClient<Retrofit> {
 
-  Retrofit retrofit;
-
-  CallTypeFinder callTypeFinder;
-
-  Gson gson;
-
-  private List<Interceptor> interceptors;
-  private List<Converter.Factory> converterFactory;
-  private OkHttpClient okHttpClient;
-
-  public RetrofitClient() {
-    this.callTypeFinder = new CallTypeFinder();
-    this.gson = new Gson();
-    this.interceptors = new ArrayList<>();
-    this.converterFactory = Collections.singletonList(GsonConverterFactory.create(getGson()));
-    this.okHttpClient = getOkHttpClient();
-  }
-
-  private Gson getGson() {
-    return new GsonBuilder()
-            .setLenient()
-            .registerTypeHierarchyAdapter(byte[].class,
-                    new ByteArrayToBase64TypeAdapter()).create();
-  }
+  private Retrofit retrofit;
+  private List<Interceptor> interceptors = new ArrayList<>();
+  private List<Converter.Factory> converterFactory = new ArrayList<>();
 
   public RetrofitClient(Interceptor... interceptors) {
-    this();
     this.interceptors = Arrays.asList(interceptors);
   }
 
   public RetrofitClient(Converter.Factory... converterFactories) {
-    this();
     this.converterFactory = Arrays.asList(converterFactories);
   }
 
-  public RetrofitClient(OkHttpClient okHttpClient) {
-    this();
-    this.okHttpClient = okHttpClient;
-  }
-
   public RetrofitClient(List<Interceptor> interceptors, List<Converter.Factory> converterFactory) {
-    this();
     this.interceptors = interceptors;
     this.converterFactory = converterFactory;
   }
 
-
   public RetrofitClient(String baseUrl) {
-    this();
     this.retrofit = build(baseUrl);
   }
 
   public RetrofitClient(Retrofit retrofit) {
-    this();
     this.retrofit = retrofit;
   }
 
   public Retrofit build(String baseUrl) {
-    Retrofit.Builder builder = retrofitClientBuilder(baseUrl);
-    retrofit = builder.build();
-    return retrofit;
+    return createRetrofitClient(baseUrl);
   }
 
-  private Retrofit.Builder retrofitClientBuilder(String baseUrl) {
-    Retrofit.Builder builder = new Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .client(okHttpClient);
-    addConverterFactories(builder);
-    return builder;
-  }
-
-  private Retrofit.Builder addConverterFactories(Retrofit.Builder retrofitBuilder) {
-    converterFactory.forEach(retrofitBuilder::addConverterFactory);
-    return retrofitBuilder;
-  }
-
-  private OkHttpClient getOkHttpClient() {
-    OkHttpClient okHttpClient =
-        getOkHttpBuilder()
-            .addInterceptor(new AllureOkHttp3())
-//            .addInterceptor(getHttpLoggingInterceptor())
-            .build();
-    return okHttpClient;
-  }
-
-  private OkHttpClient.Builder getOkHttpBuilder() {
-    OkHttpClient.Builder builder = new OkHttpClient.Builder();
-    interceptors.forEach(builder::addNetworkInterceptor);
-    return builder;
-  }
-
-  private HttpLoggingInterceptor getHttpLoggingInterceptor() {
-    HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-    interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-    return interceptor;
-  }
-
-  public <Type> Type execute(Call<Type> call) {
-    Response<Type> execute = executeAsResponse(call);
-    if (callTypeFinder.getType(call).equals(Response.class)) {
-      return (Type) execute;
+  @SuppressWarnings("unchecked")
+  public <T> T execute(Call<T> call) {
+    Response<T> execute = executeAsResponse(call);
+    if (CallTypeFinder.getInstance().getType(call).equals(Response.class)) {
+      return (T) execute;
     }
     try {
       return execute.isSuccessful()
           ? execute.body()
-          : gson.fromJson(execute.errorBody().string(), mapErrorType(call));
+          : new Gson()
+              .fromJson(
+                  execute.errorBody() != null ? execute.errorBody().string() : "{'error': ''}",
+                  mapErrorType(call));
     } catch (IOException e) {
       throw new RuntimeException(String.format("Cannot parse error %s", e.getMessage()));
     }
   }
 
-  public <Type> Type executeAsObj(Call<Type> call) {
+  @Override
+  public <T> T executeAsObj(Call<T> call) {
     return execute(call);
   }
 
-  public <Type> Response<Type> executeAsResponse(Call<Type> call) {
+  public <T> Response<T> executeAsResponse(Call<T> call) {
     try {
       return call.execute();
     } catch (IOException ex) {
@@ -148,19 +85,41 @@ public class RetrofitClient implements HttpClient<Retrofit> {
     return retrofit.create(serviceClass);
   }
 
-  private <Type> Class<Type> mapErrorType(Call<Type> call) {
-    return callTypeFinder.getType(call);
+  private Retrofit createRetrofitClient(String baseUrl) {
+    OkHttpClient client = createOkHttpClient();
+    Retrofit.Builder builder = new Retrofit.Builder().baseUrl(baseUrl).client(client);
+    converterFactory.add(GsonConverterFactory.create(getGson()));
+    converterFactory.forEach(builder::addConverterFactory);
+    return builder.build();
+  }
+
+  private OkHttpClient createOkHttpClient() {
+    OkHttpClient.Builder builder = new OkHttpClient.Builder();
+    interceptors.forEach(builder::addInterceptor);
+    return builder.build();
+  }
+
+  private HttpLoggingInterceptor getHttpLoggingInterceptor() {
+    HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+    interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+    return interceptor;
+  }
+
+  private <T> Class<T> mapErrorType(Call<T> call) {
+    return CallTypeFinder.getInstance().getType(call);
+  }
+
+  private Gson getGson() {
+    return new GsonBuilder()
+        .setLenient()
+        .registerTypeHierarchyAdapter(byte[].class, new ByteArrayToBase64TypeAdapter())
+        .create();
   }
 
   private static class ByteArrayToBase64TypeAdapter implements JsonDeserializer<byte[]> {
-    public byte[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public byte[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
       String asString = json.getAsString();
-      try {
-        asString.getBytes("UTF-8");
-      } catch (UnsupportedEncodingException e) {
-        e.printStackTrace();
-      }
-      return new byte[]{0};
+      return asString.getBytes(StandardCharsets.UTF_8);
     }
   }
 }

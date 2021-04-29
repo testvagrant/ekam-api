@@ -17,19 +17,18 @@ import java.util.List;
 @Guice(modules = {PropertyModule.class})
 public class APITests {
 
-  AnimalFactsClient animalFactsClient;
-  AnimalFactsClientWithoutBaseUrl animalFactsClientWithoutBaseUrl;
-  AnimalFactsAssertions animalFactsAssertions;
+  private AnimalFactsClient animalFactsClient;
+  private AnimalFactsClientWithoutBaseUrl animalFactsClientWithoutBaseUrl;
+  private AnimalFactsAssertions animalFactsAssertions;
 
-  @Inject
-  AnimalFactsClientGuice animalFactsClientGuice;
+  @Inject AnimalFactsClientGuice animalFactsClientGuice;
 
-  @Inject
-  AnimalFactsAssertions animalFactsAssertionsGuice;
+  @Inject AnimalFactsAssertions animalFactsAssertionsGuice;
 
   @Test(groups = "api")
   public void getAnimalFacts() {
-    Response<List<CatFacts>> catFacts = new AnimalFactsClient("https://cat-fact.herokuapp.com").getCatFacts();
+    Response<List<CatFacts>> catFacts =
+        new AnimalFactsClient("https://cat-fact.herokuapp.com").getCatFacts();
     new AnimalFactsAssertions().assertThatCatFactsAreAvailable(catFacts);
   }
 
@@ -42,7 +41,8 @@ public class APITests {
   @Test(groups = "api")
   public void getAnimalFactsWithoutBaseUrl() {
     RetrofitClient retrofitClient = new RetrofitClient("https://cat-fact.herokuapp.com");
-    Response<List<CatFacts>> catFacts = new AnimalFactsClientWithoutBaseUrl(retrofitClient).getCatFacts();
+    Response<List<CatFacts>> catFacts =
+        new AnimalFactsClientWithoutBaseUrl(retrofitClient).getCatFacts();
     new AnimalFactsAssertions().assertThatCatFactsAreAvailable(catFacts);
   }
 }

@@ -1,9 +1,10 @@
 package com.testvagrant.ekam.api.retrofit;
 
-import com.testvagrant.ekam.api.restassured.RestAssuredClient;
-import com.testvagrant.ekam.api.retrofit.RetrofitClient;
 import okhttp3.Interceptor;
+import retrofit2.Converter;
 import retrofit2.Retrofit;
+
+import java.util.List;
 
 public class RetrofitBaseClient {
 
@@ -19,7 +20,26 @@ public class RetrofitBaseClient {
   }
 
   public RetrofitBaseClient(String baseUrl) {
-    this.httpClient = new RetrofitClient();
+    this.httpClient = new RetrofitClient(baseUrl);
+  }
+
+  public RetrofitBaseClient(String baseUrl, Interceptor... interceptor) {
+    this.httpClient = new RetrofitClient(interceptor);
     this.httpClient.build(baseUrl);
+  }
+
+  public RetrofitBaseClient(String baseUrl, Converter.Factory... converterFactories) {
+    this.httpClient = new RetrofitClient(converterFactories);
+    this.httpClient.build(baseUrl);
+  }
+
+  public RetrofitBaseClient(
+      String baseurl, List<Interceptor> interceptors, List<Converter.Factory> converterFactories) {
+    this.httpClient = new RetrofitClient(interceptors, converterFactories);
+    this.httpClient.build(baseurl);
+  }
+
+  public RetrofitBaseClient(Retrofit retrofit) {
+    this.httpClient = new RetrofitClient(retrofit);
   }
 }

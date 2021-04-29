@@ -1,7 +1,6 @@
 package com.testvagrant.ekam.api.modules;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Key;
 import com.google.inject.name.Names;
 
 import java.io.IOException;
@@ -18,13 +17,13 @@ public class PropertyModule extends AbstractModule {
   }
 
   private Properties loadProperties() {
-    String envFile = String.format("envs/%s.properties", System.getProperty("env","staging"));
+    String envFile = String.format("envs/%s.properties", System.getProperty("env", "staging"));
     Properties envProps = new Properties();
     try {
       InputStream envStream = this.getClass().getClassLoader().getResourceAsStream(envFile);
       envProps.load(Objects.requireNonNull(envStream));
     } catch (IOException | NullPointerException e) {
-      //ignore
+      System.out.println(e.getMessage());
     }
     return envProps;
   }
