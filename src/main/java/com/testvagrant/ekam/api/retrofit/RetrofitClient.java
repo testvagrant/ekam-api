@@ -46,7 +46,8 @@ public class RetrofitClient implements HttpClient<Retrofit> {
   }
 
   public Retrofit build(String baseUrl) {
-    return createRetrofitClient(baseUrl);
+    retrofit = createRetrofitClient(baseUrl);
+    return retrofit;
   }
 
   @SuppressWarnings("unchecked")
