@@ -73,10 +73,9 @@ publishing {
             customizePom(pom)
             groupId 'com.testvagrant.ekam'
             artifactId 'ekam-api'
-            version '0.0.1-alpha'
+            version '0.0.2-alpha'
 
             from components.java
-
 
             artifact(sourceJar) {
                 classifier = 'sources'
