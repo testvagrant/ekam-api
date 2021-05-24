@@ -1,4 +1,4 @@
-package com.testvagrant.ekam.api.modules;
+package com.testvagrant.ekam.api.retrofit.modules;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;

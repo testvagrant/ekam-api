@@ -1,12 +1,12 @@
-package com.testvagrant.ekam.api;
+package com.testvagrant.ekam.api.retrofit;
 
 import com.google.inject.Inject;
-import com.testvagrant.ekam.api.assertions.AnimalFactsAssertions;
-import com.testvagrant.ekam.api.endpoints.AnimalFactsClient;
-import com.testvagrant.ekam.api.endpoints.AnimalFactsClientGuice;
-import com.testvagrant.ekam.api.endpoints.AnimalFactsClientWithoutBaseUrl;
+import com.testvagrant.ekam.api.retrofit.assertions.AnimalFactsAssertions;
+import com.testvagrant.ekam.api.retrofit.endpoints.AnimalFactsClient;
+import com.testvagrant.ekam.api.retrofit.endpoints.AnimalFactsClientGuice;
+import com.testvagrant.ekam.api.retrofit.endpoints.AnimalFactsClientWithoutBaseUrl;
 import com.testvagrant.ekam.api.models.CatFacts;
-import com.testvagrant.ekam.api.modules.PropertyModule;
+import com.testvagrant.ekam.api.retrofit.modules.PropertyModule;
 import com.testvagrant.ekam.api.retrofit.RetrofitClient;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;

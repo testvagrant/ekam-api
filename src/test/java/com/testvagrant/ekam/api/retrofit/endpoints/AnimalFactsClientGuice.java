@@ -1,17 +1,20 @@
-package com.testvagrant.ekam.api.endpoints;
+package com.testvagrant.ekam.api.retrofit.endpoints;
 
+import com.google.inject.Inject;
 import com.testvagrant.ekam.api.models.CatFacts;
 import com.testvagrant.ekam.api.retrofit.RetrofitBaseClient;
 import retrofit2.Call;
 import retrofit2.Response;
 
+import javax.inject.Named;
 import java.util.List;
 
-public class AnimalFactsClient extends RetrofitBaseClient {
+public class AnimalFactsClientGuice extends RetrofitBaseClient {
 
   private final AnimalFactsService animalFactsService;
 
-  public AnimalFactsClient(String baseUrl) {
+  @Inject
+  public AnimalFactsClientGuice(@Named("catFactsHost") String baseUrl) {
     super(baseUrl);
     animalFactsService = httpClient.getService(AnimalFactsService.class);
   }

@@ -1,4 +1,4 @@
-package com.testvagrant.ekam.api.assertions;
+package com.testvagrant.ekam.api.retrofit.assertions;
 
 import com.testvagrant.ekam.api.models.CatFacts;
 import org.testng.Assert;

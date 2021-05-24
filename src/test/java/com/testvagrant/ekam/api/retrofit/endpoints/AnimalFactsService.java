@@ -1,4 +1,4 @@
-package com.testvagrant.ekam.api.endpoints;
+package com.testvagrant.ekam.api.retrofit.endpoints;
 
 import com.testvagrant.ekam.api.models.CatFacts;
 import retrofit2.Call;

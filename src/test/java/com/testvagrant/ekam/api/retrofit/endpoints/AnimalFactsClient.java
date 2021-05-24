@@ -1,19 +1,18 @@
-package com.testvagrant.ekam.api.endpoints;
+package com.testvagrant.ekam.api.retrofit.endpoints;
 
 import com.testvagrant.ekam.api.models.CatFacts;
 import com.testvagrant.ekam.api.retrofit.RetrofitBaseClient;
-import com.testvagrant.ekam.api.retrofit.RetrofitClient;
 import retrofit2.Call;
 import retrofit2.Response;
 
 import java.util.List;
 
-public class AnimalFactsClientWithoutBaseUrl extends RetrofitBaseClient {
+public class AnimalFactsClient extends RetrofitBaseClient {
 
   private final AnimalFactsService animalFactsService;
 
-  public AnimalFactsClientWithoutBaseUrl(RetrofitClient retrofitClient) {
-    super(retrofitClient);
+  public AnimalFactsClient(String baseUrl) {
+    super(baseUrl);
     animalFactsService = httpClient.getService(AnimalFactsService.class);
   }
 
