@@ -14,34 +14,52 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class RetrofitClient implements HttpClient<Retrofit> {
 
   private Retrofit retrofit;
+  private Duration readTimeout;
+  private Duration connectTimeout;
   private List<Interceptor> interceptors = new ArrayList<>();
   private List<Converter.Factory> converterFactory = new ArrayList<>();
 
   public RetrofitClient(Interceptor... interceptors) {
-    this.interceptors = Arrays.asList(interceptors);
+    this(Duration.ofSeconds(120), Duration.ofSeconds(120), Arrays.asList(interceptors), new ArrayList<>());
+  }
+
+  public RetrofitClient(Duration readTimeout, Duration connectTimeout, Interceptor... interceptors) {
+    this(readTimeout, connectTimeout, Arrays.asList(interceptors), new ArrayList<>());
   }
 
   public RetrofitClient(Converter.Factory... converterFactories) {
-    this.converterFactory = Arrays.asList(converterFactories);
+    this(Duration.ofSeconds(120), Duration.ofSeconds(120), new ArrayList<>(), Arrays.asList(converterFactories));
   }
 
   public RetrofitClient(List<Interceptor> interceptors, List<Converter.Factory> converterFactory) {
+    this(Duration.ofSeconds(120), Duration.ofSeconds(120), interceptors, converterFactory);
+  }
+
+  public RetrofitClient(Duration readTimeout, Duration connectTimeout, List<Interceptor> interceptors, List<Converter.Factory> converterFactory) {
     this.interceptors = interceptors;
     this.converterFactory = converterFactory;
+    this.readTimeout = readTimeout;
+    this.connectTimeout = connectTimeout;
   }
 
   public RetrofitClient(String baseUrl) {
+    this.readTimeout = Duration.ofSeconds(120);
+    this.connectTimeout = Duration.ofSeconds(120);
     this.retrofit = build(baseUrl);
   }
 
   public RetrofitClient(Retrofit retrofit) {
+    this.readTimeout = Duration.ofSeconds(120);
+    this.connectTimeout = Duration.ofSeconds(120);
     this.retrofit = retrofit;
   }
 
@@ -97,6 +115,8 @@ public class RetrofitClient implements HttpClient<Retrofit> {
   private OkHttpClient createOkHttpClient() {
     OkHttpClient.Builder builder = new OkHttpClient.Builder();
     interceptors.forEach(builder::addInterceptor);
+    builder.readTimeout(readTimeout);
+    builder.connectTimeout(connectTimeout);
     return builder.build();
   }
 

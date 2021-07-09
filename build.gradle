@@ -19,6 +19,8 @@ repositories {
     jcenter()
 }
 
+sourceCompatibility = 1.8
+
 dependencies {
     // Google
     implementation 'com.google.guava:guava:28.0-jre'
@@ -73,7 +75,7 @@ publishing {
             customizePom(pom)
             groupId 'com.testvagrant.ekam'
             artifactId 'ekam-api'
-            version '0.0.2-alpha'
+            version '0.0.3-alpha'
 
             from components.java
 

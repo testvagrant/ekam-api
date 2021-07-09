@@ -4,6 +4,7 @@ import okhttp3.Interceptor;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
 
+import java.time.Duration;
 import java.util.List;
 
 public class RetrofitBaseClient {
@@ -25,6 +26,11 @@ public class RetrofitBaseClient {
 
   public RetrofitBaseClient(String baseUrl, Interceptor... interceptor) {
     this.httpClient = new RetrofitClient(interceptor);
+    this.httpClient.build(baseUrl);
+  }
+
+  public RetrofitBaseClient(String baseUrl, Duration readTimeout, Duration connectTimeout, Interceptor... interceptor) {
+    this.httpClient = new RetrofitClient(readTimeout, connectTimeout, interceptor);
     this.httpClient.build(baseUrl);
   }
 
