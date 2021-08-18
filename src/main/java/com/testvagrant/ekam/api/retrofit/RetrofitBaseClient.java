@@ -29,7 +29,8 @@ public class RetrofitBaseClient {
     this.httpClient.build(baseUrl);
   }
 
-  public RetrofitBaseClient(String baseUrl, Duration readTimeout, Duration connectTimeout, Interceptor... interceptor) {
+  public RetrofitBaseClient(
+      String baseUrl, Duration readTimeout, Duration connectTimeout, Interceptor... interceptor) {
     this.httpClient = new RetrofitClient(readTimeout, connectTimeout, interceptor);
     this.httpClient.build(baseUrl);
   }

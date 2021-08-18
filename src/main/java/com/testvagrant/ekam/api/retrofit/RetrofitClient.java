@@ -18,33 +18,45 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class RetrofitClient implements HttpClient<Retrofit> {
 
   private Retrofit retrofit;
-  private Duration readTimeout;
-  private Duration connectTimeout;
+  private final Duration readTimeout;
+  private final Duration connectTimeout;
   private List<Interceptor> interceptors = new ArrayList<>();
   private List<Converter.Factory> converterFactory = new ArrayList<>();
 
   public RetrofitClient(Interceptor... interceptors) {
-    this(Duration.ofSeconds(120), Duration.ofSeconds(120), Arrays.asList(interceptors), new ArrayList<>());
+    this(
+        Duration.ofSeconds(120),
+        Duration.ofSeconds(120),
+        Arrays.asList(interceptors),
+        new ArrayList<>());
   }
 
-  public RetrofitClient(Duration readTimeout, Duration connectTimeout, Interceptor... interceptors) {
+  public RetrofitClient(
+      Duration readTimeout, Duration connectTimeout, Interceptor... interceptors) {
     this(readTimeout, connectTimeout, Arrays.asList(interceptors), new ArrayList<>());
   }
 
   public RetrofitClient(Converter.Factory... converterFactories) {
-    this(Duration.ofSeconds(120), Duration.ofSeconds(120), new ArrayList<>(), Arrays.asList(converterFactories));
+    this(
+        Duration.ofSeconds(120),
+        Duration.ofSeconds(120),
+        new ArrayList<>(),
+        Arrays.asList(converterFactories));
   }
 
   public RetrofitClient(List<Interceptor> interceptors, List<Converter.Factory> converterFactory) {
     this(Duration.ofSeconds(120), Duration.ofSeconds(120), interceptors, converterFactory);
   }
 
-  public RetrofitClient(Duration readTimeout, Duration connectTimeout, List<Interceptor> interceptors, List<Converter.Factory> converterFactory) {
+  public RetrofitClient(
+      Duration readTimeout,
+      Duration connectTimeout,
+      List<Interceptor> interceptors,
+      List<Converter.Factory> converterFactory) {
     this.interceptors = interceptors;
     this.converterFactory = converterFactory;
     this.readTimeout = readTimeout;
